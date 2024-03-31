@@ -4,3 +4,5 @@
 支持的谱面声明包括：
 函数：arc()、arctap()、timing()和hold()，scenecontrol()会被忽略，将会加入对timinggroup()的支持
 easing：b、s、si、so、sisi、soso、siso和sosi
+
+新的功能会在modify文件夹内测试，根目录为稳定版本
