@@ -2,7 +2,9 @@
 
 需要您手动提取谱面文件（网上搜索一下就能找到），再运行main.py，按照程序提示输入。
 支持的谱面声明包括：
-函数：arc()、arctap()、timing()和hold()，scenecontrol()会被忽略，将会加入对timinggroup()的支持
+函数：arc()、arctap()、timing()和hold()，scenecontrol()会被忽略，将会加入对timinggroup()的支持，也许会做camera()
 easing：b、s、si、so、sisi、soso、siso和sosi
 
 新的功能会在modify文件夹内测试，根目录为稳定版本
+
+（周中要上课没时间做项目，更新只会在周末发）
