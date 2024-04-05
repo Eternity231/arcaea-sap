@@ -33,18 +33,6 @@ class CoordConv:
         x_, y_, z_ = np.array((x, y, 1)) @ self.trans_mat
         return x_ / z_, y_ / z_
 
-def rotate_point(point, angle_x, angle_y):
-    x, y, z = point
-    if angle_x:
-        angle_x = angle_x * pi / 180
-        rot_mat_x = np.array([[1, 0, 0], [0, cos(angle_x), -sin(angle_x)], [0, sin(angle_x), cos(angle_x)]])
-        x, y, z = (np.array([x, y, z]) @ rot_mat_x).tolist()
-    if angle_y:
-        angle_y = angle_y * pi / 180
-        rot_mat_y = np.array([[cos(angle_y), 0, sin(angle_y)], [0, 1, 0], [-sin(angle_y), 0, cos(angle_y)]])
-        x, y, z = (np.array([x, y, z]) @ rot_mat_y).tolist()
-    return x, y, z
-
 def solve(chart: Chart, converter: CoordConv) -> dict[int, list[TouchEvent]]:
     result = {}
 

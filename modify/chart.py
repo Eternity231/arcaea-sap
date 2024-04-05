@@ -12,17 +12,6 @@ class ArcTap:
     def __str__(self):
         return f'arctap(tick={self.tick})'
 
-class TimingGroup:
-    notes: list[Union[Timing, Tap, Hold, Arc]]
-    options: dict[str, Any] | None
-    angle_x: int | None
-    angle_y: int | None
-
-    def __init__(self, notes, options, angle_x=None, angle_y=None):
-        self.notes = notes
-        self.options = options
-        self.angle_x = angle_x
-        self.angle_y = angle_y
 
 class Arc: #虹弧Arc & 天空Note
     start: int
@@ -111,11 +100,21 @@ class Timing:
         return f'timing(tick={self.tick}, bpm={self.bpm}, beats_per_measure={self.beats_per_measure})'
 
 
+class TimingGroup:
+    notes: list[Union[Arc, Timing, Tap, Hold]]  # 可以根据需要添加其他类型
+
+    def __init__(self, notes: list[Union[Arc, Timing]]):
+        self.notes = notes
+
+    def __str__(self):
+        return f'timinggroup(notes={self.notes})'
+
+
 class Chart:
-    notes: list[Union[Timing, Tap, Hold, Arc]]
+    notes: list[Union[Timing, Tap, Hold, Arc, 'TimingGroup']]
     options: dict[str, Any] | None
 
-    def __init__(self, notes: list[Union[Timing, Tap, Hold, Arc]], options: dict[str, Any] | None = None):
+    def __init__(self, notes: list[Union[Timing, Tap, Hold, Arc, 'TimingGroup']], options: dict[str, Any] | None = None):
         self.notes = notes
         self.options = options
 
@@ -142,16 +141,44 @@ class Chart:
             'sisi': Easing.SiSi,
             'sosi': Easing.SoSi,
             'siso': Easing.SiSo,
+            'timinggroup': TimingGroup, 
         }
         for line in line_iter:
             if ':' in line:
                 key, value = line.split(':')
                 options[key] = value
+            elif line.startswith('timinggroup'):
+                # 忽略 timinggroup 括号内的内容
+                open_brace_count = 0
+                timinggroup_line = ''
+                for char in line:
+                    if char == '(':
+                        open_brace_count += 1
+                    elif char == ')':
+                        open_brace_count -= 1
+                    timinggroup_line += char
+                    if open_brace_count == 0:
+                        break
+                # 解析 timinggroup 外的内容
+                res = eval(timinggroup_line[:-1], {}, lcls)
+                notes.append(TimingGroup(*res))
+                # 继续处理 timinggroup 大括号内的内容
+                open_brace_count = 1
+                while open_brace_count > 0:
+                    next_line = next(line_iter)
+                    for char in next_line:
+                        if char == '{':
+                            open_brace_count += 1
+                        elif char == '}':
+                            open_brace_count -= 1
+                    # 解析 timinggroup 大括号内的内容
+                    if open_brace_count > 0:
+                        res = eval(next_line[:-1], {}, lcls)
+                        notes.extend(res)
             else:
-                break
-        for line in line_iter:
-            res = eval(line[:-1], {}, lcls)
-            notes.append(Tap(*res) if isinstance(res, tuple) else res)
+                # 解析其他类型
+                res = eval(line[:-1], {}, lcls)
+                notes.append(Tap(*res) if isinstance(res, tuple) else res)
         return Chart(notes, options)
 
     def __str__(self):
