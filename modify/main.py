@@ -21,7 +21,7 @@ if __name__ == '__main__':
     ans_iter = iter(sorted(ans.items()))
     ms, evs = next(ans_iter)
 
-    ctl = DeviceController(server_dir='')
+    ctl = DeviceController(server_dir='.')
     ctl.tap(*retry_button)
     start = time() + delay
     print('[client] INFO: 自动打歌已启动')
